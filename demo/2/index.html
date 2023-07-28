@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadisticas Covid</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.3.2/chart.umd.js"></script>
+    <script src="./data.js"></script>
+</head>
+<body>
+    <div class="p-6">
+        <!-- <div class="print:hidden">
+            <button class="border-2 p-2 px-4 rounded" onclick="window.print()">Generar PDF</button>
+        </div> -->
+        <div class="m-auto w-full max-w-5xl h-[30rem] print:h-auto print:max-w-none">
+            <canvas id="casosTotalesPorRegion" class="w-full" aria-label="Estadistica Covid-19" role="img">
+                <p>Este navegador no soporta el elemento canvas. Ver soporte <a href="https://caniuse.com/canvas" target="_blank">aqui</a></p>
+            </canvas>
+        </div>
+        <span class="mr-auto text-xs">Origen de los datos <a href="https://github.com/MinCiencia/Datos-COVID19" target="_blank" class="text-blue-400 underline">aqui</a>.</span>
+    </div>
+
+    <script>
+            new Chart(
+                document.getElementById('casosTotalesPorRegion'),
+                {
+                type: 'bar',
+                data: {
+                    labels: DATA.map(row => row.Region != 'Total' ? row.Region : null ),
+                    datasets: [
+                    {
+                        label: 'Casos totales acumulados por Region',
+                        data: DATA.map(row => row.Region != 'Total' ? row['Casos totales acumulados'] : null),
+                        backgroundColor: '#c9cbcf',
+                    },
+                    {
+                        label: 'Fallecidos confirmados totales',
+                        data: DATA.map(row => row.Region != 'Total' ? row['Fallecidos confirmados totales'] : null),
+                        backgroundColor: '#fcaeae',
+                    },
+                    {
+                        label: 'Casos confirmados recuperados',
+                        data: DATA.map(row => row.Region != 'Total' ? row['Casos confirmados recuperados'] : null),
+                        backgroundColor: '#4bc0c0',
+                    },
+                    
+                ]},
+                options: {
+                    responsive: true,
+                },
+                }
+            );
+    </script>
+</body>
+</html>
