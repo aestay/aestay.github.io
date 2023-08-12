@@ -7,50 +7,163 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.3.2/chart.umd.js"></script>
     <script src="./data.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
-    <div class="p-6">
-        <!-- <div class="print:hidden">
-            <button class="border-2 p-2 px-4 rounded" onclick="window.print()">Generar PDF</button>
-        </div> -->
-        <div class="m-auto w-full max-w-5xl h-[30rem] print:h-auto print:max-w-none">
-            <canvas id="casosTotalesPorRegion" class="w-full" aria-label="Estadistica Covid-19" role="img">
-                <p>Este navegador no soporta el elemento canvas. Ver soporte <a href="https://caniuse.com/canvas" target="_blank">aqui</a></p>
-            </canvas>
+    <div class="bg-slate-50">
+        <div class="p-2 sticky top-0 bg-white shadow-sm flex justify-between">
+            <button class="border-2 p-1 px-4 rounded" id="buttonGeneratePDF">Generar PDF</button>
+            <div class="px-14 text-sm">
+                <div class="text-center">Tipo de Grafico:</div>
+                <label class="cursor-pointer">Vertical: <input type="radio" name="chartType" value="x" checked></label>
+                <label class="cursor-pointer">Horizontal: <input type="radio" name="chartType" value="y"></label>
+            </div>
+
+        </div>
+        <div id="wrapperPDF" class="p-6">
+            <div class="m-auto mb-8 w-full max-w-5xl h-[30rem] bg-white border p-2 html2pdf__page-break">
+                <canvas id="canvasConfirmadosRegionales" class="w-full " aria-label="Estadistica Covid-19" role="img">
+                    <p>Este navegador no soporta el elemento canvas. Ver soporte <a href="https://caniuse.com/canvas" target="_blank">aqui</a></p>
+                </canvas>
+            </div>
+            <div class="m-auto mb-8 w-full max-w-5xl h-[30rem] bg-white border p-2 html2pdf__page-break">
+                <canvas id="canvasPCRRegional" class="w-full " aria-label="Estadistica Covid-19" role="img">
+                    <p>Este navegador no soporta el elemento canvas. Ver soporte <a href="https://caniuse.com/canvas" target="_blank">aqui</a></p>
+                </canvas>
+            </div>
+            <div class="m-auto mb-8 w-full max-w-5xl h-[30rem] bg-white border p-2">
+                <canvas id="canvasFallecidosEtarios" class="w-full " aria-label="Estadistica Covid-19" role="img">
+                    <p>Este navegador no soporta el elemento canvas. Ver soporte <a href="https://caniuse.com/canvas" target="_blank">aqui</a></p>
+                </canvas>
+            </div>
         </div>
         <span class="mr-auto text-xs">Origen de los datos <a href="https://github.com/MinCiencia/Datos-COVID19" target="_blank" class="text-blue-400 underline">aqui</a>.</span>
     </div>
 
     <script>
-            new Chart(
-                document.getElementById('casosTotalesPorRegion'),
-                {
-                type: 'bar',
-                data: {
-                    labels: DATA.map(row => row.Region != 'Total' ? row.Region : null ),
-                    datasets: [
+            async function createChart(element, options) {
+
+                new Chart(element, options)
+            }
+
+            function setGraphics(indexAxis = 'x') {
+                let temp = Chart.getChart("canvasConfirmadosRegionales");
+                if( temp != undefined ) temp.destroy()
+                temp = Chart.getChart("canvasPCRRegional");
+                if( temp != undefined ) temp.destroy()
+                temp = Chart.getChart("canvasFallecidosEtarios");
+                if( temp != undefined ) temp.destroy()
+
+                createChart(
+                    document.getElementById('canvasConfirmadosRegionales'),
                     {
-                        label: 'Casos totales acumulados por Region',
-                        data: DATA.map(row => row.Region != 'Total' ? row['Casos totales acumulados'] : null),
-                        backgroundColor: '#c9cbcf',
+                    type: 'bar',
+                    data: {
+                        labels: DATA.confirmadosRegional.map(row => row.Region != 'Total' ? row.Region : null ),
+                        datasets: [
+                        {
+                            label: 'Casos totales acumulados por Region (24-07-2022)',
+                            data: DATA.confirmadosRegional.map(row => row.Region != 'Total' ? row['Casos totales acumulados'] : null),
+                            backgroundColor: '#c9cbcf',
+                        },
+                        {
+                            label: 'Fallecidos confirmados totales (24-07-2022)',
+                            data: DATA.confirmadosRegional.map(row => row.Region != 'Total' ? row['Fallecidos confirmados totales'] : null),
+                            backgroundColor: '#fcaeae',
+                        },
+                        {
+                            label: 'Casos confirmados recuperados (24-07-2022)',
+                            data: DATA.confirmadosRegional.map(row => row.Region != 'Total' ? row['Casos confirmados recuperados'] : null),
+                            backgroundColor: '#4bc0c0',
+                        },
+                        
+                    ]},
+                    options: {
+                        indexAxis: indexAxis,
+                        responsive: true,
                     },
+                    }
+                )
+
+                createChart(
+                    document.getElementById('canvasPCRRegional'),
                     {
-                        label: 'Fallecidos confirmados totales',
-                        data: DATA.map(row => row.Region != 'Total' ? row['Fallecidos confirmados totales'] : null),
-                        backgroundColor: '#fcaeae',
+                    type: 'bar',
+                    data: {
+                        labels: DATA.PCRRegional.map(row => row.Region ),
+                        datasets: [
+                        {
+                            label: 'Poblacion',
+                            data: DATA.PCRRegional.map(row => row.Poblacion),
+                            backgroundColor: '#c9cbcf',
+                        },
+                        {
+                            label: 'PCR (24-07-2022)',
+                            data: DATA.PCRRegional.map(row => row["2021-07-24"]),
+                            backgroundColor: '#8585e9',
+                        },
+                        {
+                            label: 'PCR (24-07-2022)',
+                            data: DATA.PCRRegional.map(row => row["2022-07-24"]),
+                            backgroundColor: '#8585e9',
+                        },
+                        {
+                            label: 'PCR (24-07-2022)',
+                            data: DATA.PCRRegional.map(row => row["2023-07-24"]),
+                            backgroundColor: '#8585e9',
+                        },
+                    ]},
+                    options: {
+                        indexAxis: indexAxis,
+                        responsive: true,
                     },
+                    }
+                )
+
+                createChart(
+                    document.getElementById('canvasFallecidosEtarios'),
                     {
-                        label: 'Casos confirmados recuperados',
-                        data: DATA.map(row => row.Region != 'Total' ? row['Casos confirmados recuperados'] : null),
-                        backgroundColor: '#4bc0c0',
+                    type: 'bar',
+                    data: {
+                        labels: DATA.fallecidosEtarios.map(row => row["Grupo de edad"] ),
+                        datasets: [
+                        {
+                            label: 'Fallecidos (24-07-2022)',
+                            data: DATA.fallecidosEtarios.map(row => row["2023-07-24"]),
+                            backgroundColor: '#ee363688',
+                        },
+                    ]},
+                    options: {
+                        indexAxis: indexAxis,
+                        responsive: true,
                     },
-                    
-                ]},
-                options: {
-                    responsive: true,
-                },
+                    }
+                )
+            }
+
+            function generatePDF() {
+                let chartType = document.querySelector('[name=chartType]:checked').value
+                // let orientation = chartType == 'x' ? 'landscape' : 'portrait'
+                let orientation = 'landscape'
+                let element = document.querySelector('#wrapperPDF')
+                let options = {
+                    margin: 4,
+                    image: { type: 'jpeg', quality: 1 },
+                    jsPDF: { orientation: orientation }
                 }
-            );
+
+                let worker = html2pdf().set(options).from(element).save();
+            }   
+
+            window.onload = () => {
+                setGraphics()
+                document.querySelector('#buttonGeneratePDF').addEventListener('click', generatePDF)
+                document.querySelectorAll('[name="chartType"]').forEach( element => {
+                    element.addEventListener('change', () => {
+                        setGraphics(element.value)
+                    })
+                })
+            }
     </script>
 </body>
 </html>
