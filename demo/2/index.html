@@ -58,7 +58,7 @@
                 if( indexAxis == 'y' ) y = true
                 document.querySelectorAll('#canvasConfirmadosRegionales, #canvasPCRRegional, #canvasFallecidosEtarios').forEach( canvas => {
                     canvas.parentElement.classList.toggle('h-[30rem]', !y)
-                    canvas.parentElement.classList.toggle('h-[60rem]', y)
+                    canvas.parentElement.classList.toggle('h-[80vh]', y)
                 })
 
                 createChart(
