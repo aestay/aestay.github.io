@@ -22,17 +22,17 @@
         </div>
         <div id="wrapperPDF" class="p-6">
             <div class="m-auto mb-8 w-full max-w-5xl h-[30rem] bg-white border p-2 html2pdf__page-break">
-                <canvas id="canvasConfirmadosRegionales" class="w-full " aria-label="Estadistica Covid-19" role="img">
+                <canvas id="canvasConfirmadosRegionales" class="w-full h-full" aria-label="Estadistica Covid-19" role="img">
                     <p>Este navegador no soporta el elemento canvas. Ver soporte <a href="https://caniuse.com/canvas" target="_blank">aqui</a></p>
                 </canvas>
             </div>
             <div class="m-auto mb-8 w-full max-w-5xl h-[30rem] bg-white border p-2 html2pdf__page-break">
-                <canvas id="canvasPCRRegional" class="w-full " aria-label="Estadistica Covid-19" role="img">
+                <canvas id="canvasPCRRegional" class="w-full h-full" aria-label="Estadistica Covid-19" role="img">
                     <p>Este navegador no soporta el elemento canvas. Ver soporte <a href="https://caniuse.com/canvas" target="_blank">aqui</a></p>
                 </canvas>
             </div>
             <div class="m-auto mb-8 w-full max-w-5xl h-[30rem] bg-white border p-2">
-                <canvas id="canvasFallecidosEtarios" class="w-full " aria-label="Estadistica Covid-19" role="img">
+                <canvas id="canvasFallecidosEtarios" class="w-full h-full" aria-label="Estadistica Covid-19" role="img">
                     <p>Este navegador no soporta el elemento canvas. Ver soporte <a href="https://caniuse.com/canvas" target="_blank">aqui</a></p>
                 </canvas>
             </div>
@@ -53,6 +53,13 @@
                 if( temp != undefined ) temp.destroy()
                 temp = Chart.getChart("canvasFallecidosEtarios");
                 if( temp != undefined ) temp.destroy()
+
+                let y = false
+                if( indexAxis == 'y' ) y = true
+                document.querySelectorAll('#canvasConfirmadosRegionales, #canvasPCRRegional, #canvasFallecidosEtarios').forEach( canvas => {
+                    canvas.parentElement.classList.toggle('h-[30rem]', !y)
+                    canvas.parentElement.classList.toggle('h-[60rem]', y)
+                })
 
                 createChart(
                     document.getElementById('canvasConfirmadosRegionales'),
@@ -81,6 +88,7 @@
                     options: {
                         indexAxis: indexAxis,
                         responsive: true,
+                        maintainAspectRatio: false,
                     },
                     }
                 )
@@ -116,6 +124,7 @@
                     options: {
                         indexAxis: indexAxis,
                         responsive: true,
+                        maintainAspectRatio: false,
                     },
                     }
                 )
@@ -136,6 +145,7 @@
                     options: {
                         indexAxis: indexAxis,
                         responsive: true,
+                        maintainAspectRatio: false,
                     },
                     }
                 )
